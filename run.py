@@ -9,6 +9,7 @@ from scipy.spatial import distance
 from sklearn.decomposition import PCA
 import simptc.configs as configs
 from simptc.model import VariationalSimPTC
+from sklearn.mixture import BayesianGaussianMixture
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +47,7 @@ def variational_simptc(unlabeled_embeddings, anchors, test_embeddings, test_labe
         data_cov_list[i] = np.cov(np.transpose(embeddings_class))
     cov_mean = data_cov_list.mean(axis=0)
 
-    model = VariationalSimPTC(
+    model = BayesianGaussianMixture(
         n_components=class_num,
         covariance_type=cov_type,
         max_iter=1,
@@ -58,7 +59,7 @@ def variational_simptc(unlabeled_embeddings, anchors, test_embeddings, test_labe
         covariance_prior=cov_mean,
     )
     
-    model.initialize_parameters_with_data(embeddings, pseudo_labels)
+    # model.initialize_parameters_with_data(embeddings, pseudo_labels)
     best_iter = 0
     best_acc = 0
     best_score = 10000
