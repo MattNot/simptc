@@ -10,7 +10,7 @@ from sklearn.metrics import confusion_matrix
 from sklearn.metrics import f1_score, precision_score, recall_score, accuracy_score
 from typing import *
 import csv
-import configs
+import simptc.configs as configs
 from scipy.spatial import distance
 from scipy.optimize import linear_sum_assignment
 

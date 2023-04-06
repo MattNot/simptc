@@ -1,2 +1,6 @@
-./datasets/
-./embeddings/
+datasets/
+datasets
+embeddings/
+embeddings
+__pycache__
+log

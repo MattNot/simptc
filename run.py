@@ -3,12 +3,12 @@ import numpy as np
 from numpy import linalg as LA
 import os
 import logging
-from utils import set_file_handler, log_bias_and_performance, get_prompt, get_train_and_test
+from simptc.utils import set_file_handler, log_bias_and_performance, get_prompt, get_train_and_test
 from sklearn.metrics import davies_bouldin_score
 from scipy.spatial import distance
 from sklearn.decomposition import PCA
-import configs
-from model import VariationalSimPTC
+import simptc.configs as configs
+from simptc.model import VariationalSimPTC
 
 logger = logging.getLogger(__name__)
 
@@ -162,8 +162,11 @@ def run_TC14(dataset, model_name='roberta_large', cov_type='tied', max_iter=50, 
     variational_simptc(unlabeled_embeddings=unlabeled_embeddings, anchors=prompt_cluster_centers, test_embeddings=text_embeddings,
             test_labels=text_labels, cov_type=cov_type, max_iter=max_iter)
 
-def main():
-    args = parse_args()
+def main(args2):
+    if args2 is None:
+        args = parse_args()
+    else:
+        args = args2
     dataset = args.dataset
     model_name = 'roberta_large'
     template_id = args.template_id
@@ -176,4 +179,4 @@ def main():
         run_TC14(dataset, model_name)
 
 if __name__ == "__main__":
-    main()
+    main(None)

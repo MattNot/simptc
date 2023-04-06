@@ -5,10 +5,14 @@ import torch
 from transformers import AutoTokenizer, AutoModel
 from tqdm.auto import tqdm
 import numpy as np
-from utils import set_file_handler
+from simptc.utils import set_file_handler
 import argparse
-import configs
+from simptc import configs as configs
 import json
+from KERMIT2_0.examples.Notebooks.scripts.script import createDTK, parse
+import os
+import pandas as pd
+os.chdir("./simptc")
 
 logger = logging.getLogger(__name__)
 
@@ -42,7 +46,9 @@ def encode_sentence(text, model, tokenizer, simcse=True):
             sent_embedding = mean_pooling(model_output, encoded_input['attention_mask']).cpu().detach().numpy()
     if not isinstance(text, list):
         sent_embedding = sent_embedding.flatten()
-    return sent_embedding
+    tree = parse(text)
+    dtk = createDTK(tree)
+    return np.concatenate((dtk, sent_embedding), axis=None)
 
 def load_texts_and_labels(dataset):
     data_path = f"./datasets/TextClassification/{dataset}/data.json"
@@ -62,6 +68,8 @@ def load_label_names(dataset):
 def load_and_encode_agnews(data_path, model, tokenizer, label_path=None, simcse=True):
     label_list = []
     embedding_list = []
+    df = pd.read_csv(data_path, header=None)
+    df.sample(1000).to_csv(data_path, index=False, header=False)
     with open(data_path, encoding="utf-8") as csv_file:
         csv_reader = csv.reader(
             csv_file, quotechar='"', delimiter=",", quoting=csv.QUOTE_ALL, skipinitialspace=True
@@ -258,8 +266,12 @@ def encode_and_save_TC14(dataset, model, tokenizer, model_name):
     encode_label_names_TC14(dataset, model, tokenizer, model_name, prompt_path, simcse)
     encode_texts_and_labels_TC14(dataset, model, tokenizer, model_name, embedding_path, simcse)
 
-def main():
-    args = parse_args()
+def main(args_2):
+    
+    if args_2 == None:
+        args = parse_args()
+    else:
+        args = args_2
     model_name = 'roberta_large'
     dataset = args.dataset
     suffix_dict = {
@@ -282,4 +294,4 @@ def main():
         encode_and_save_TC14(dataset, model, tokenizer, model_name)
 
 if __name__ == "__main__":
-    main()
+    main(None)
